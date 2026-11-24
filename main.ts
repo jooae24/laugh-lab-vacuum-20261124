@@ -1,21 +1,42 @@
-// The line is built to the judge's published brief: it is a short funny line answering the prompt (the excuse a robot vacuum gives after eating a sock), the laugh comes from the deadpan turn at the end ('I followed the spec'), the angle is fresh rather than a stock joke, the joke comes from the fit with the situation, and it is short and punchy with every word working.
+// laugh-lab-vacuum-20261124 — my entry for make.fun's "One-Liner Laugh
+// Lab" bounty ($2.50 USDC, 200 characters max).
 //
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// The prompt asked for the excuse a robot vacuum gives after eating a sock.
+// Mine answers in three deadpan beats — told to clean the floor, sock on
+// the floor, spec followed — and the punchline is that the machine is
+// technically right. No human would defend itself this way; only a vacuum
+// with a requirements document would.
+//
+// Run it by hand (the grader sets MAKEFUN_OUTPUT_DIR to /output):
+//   MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import * as fs from "node:fs";
+import * as path from "node:path";
 
-const text =
-  "I was told to clean the floor. The sock was on the floor. I followed " +
-  "the spec.";
+const JOKE = "I was told to clean the floor. The sock was on the floor. I followed the spec.";
+const MAXLEN = 200;
 
-// Guard the gate before writing: 1 to 200 characters, not only white space.
-const length = [...text].length;
-if (length < 1 || length > 200 || text.trim().length === 0) {
-  throw new Error(`entry text must be 1-200 characters, got ${length}`);
+function checkLine(value) {
+  const len = [...value].length;
+  if (value.trim().length === 0) {
+    throw new Error("line is empty, nothing to write");
+  }
+  if (len > MAXLEN) {
+    throw new Error(`line is ${len} chars, max is ${MAXLEN}`);
+  }
+  if (value.includes("\n")) {
+    throw new Error("line must not contain a newline");
+  }
+  if (!/^[A-Z]/.test(value)) {
+    throw new Error("line must start with a capital letter");
+  }
 }
 
-const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-mkdirSync(out, { recursive: true });
-writeFileSync(join(out, 'entry.txt'), text + '\n');
+function main() {
+  checkLine(JOKE);
+  const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(path.join(outDir, "entry.txt"), JOKE + "\n");
+}
+
+main();
